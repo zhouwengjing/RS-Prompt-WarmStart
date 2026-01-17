@@ -112,7 +112,7 @@ def run_validation(device):
         print(f"Loading parameter file: {param_path}")
         try:
             saved_ctx = torch.load(param_path, map_location=device)
-            model.ctx.data = best_ctx.data
+            model.ctx.data = saved_ctx.data
             print(">>> Parameter loading successful!")
 
             evaluate_detailed_accuracy(model, test_loader, device, class_names, title="Validation Mode Result")

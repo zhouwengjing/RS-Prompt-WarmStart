@@ -1,63 +1,186 @@
-## 环境搭建
+# Initialization Matters: Deterministic Warm-Start Prompt Learning for Remote Sensing Recognition
 
-基础环境准备（需要先下载好 anaconda3）
+## 📖 Introduction
 
-在终端创建名为 multimodal-env 虚拟环境并切换到这环境上
+This repository contains the official implementation of our paper.
 
-```
+In this work, we investigate the **Prompt Learning** paradigm for remote sensing image recognition. While Context Optimization (CoOp) has shown success in natural images, we identify a severe **"Cold Start" instability** when applying it to remote sensing domains under standard random initialization.
+
+To address this, we **systematically validate** a **Semantically Guided "Warm Start" Strategy**. By initializing context vectors with semantic priors (e.g., "a photo of a"), we position the model within a valid semantic manifold. Our experiments demonstrate that this strategy is **critical** for remote sensing tasks, ensuring **deterministic convergence** and **robust performance** comparable to fully supervised baselines, without the risk of optimization collapse.
+
+**Key Features:**
+
+- 🚀 **High Performance:** Boosts EuroSAT accuracy from **43.25% (Zero-shot)** to **91.85%**, achieving performance competitive with well-tuned baselines.
+
+  🛡️ **Stability & Robustness:** Identifies and eliminates the **"Cold Start" failure** observed in high-variance random initialization.
+
+  💾 **Parameter Efficient:** Requires only **~32 KB** of storage for task-specific parameters, making it ideal for bandwidth-constrained edge deployment.
+
+------
+
+## 🛠️ Environment Setup
+
+We recommend using **Anaconda** to manage the environment.
+
+### 1. Create Environment
+
+```bash
+# Create a virtual environment with Python 3.10
 conda create -n multimodal-env python=3.10
 conda activate multimodal-env
 ```
 
-我们的实验都是在 GPU 上运行的
+### 2. Install Dependencies
 
-```
-# 检查是否有 NVIDIA GPU
-nvidia-smi
-```
+Ensure you have a GPU available (check with `nvidia-smi`).
 
-我们下载的是 PyTorch 12.6 版本
-
-访问 PyTorch 的官方网站  https://pytorch.org/get-started/locally/
-
-在刚才打开的终端下载 requirements.txt 中的库文件
-
-```
+```bash
+# Install other requirements
 pip install -r requirements.txt
 ```
 
-环境配置完整！
+------
 
-## 数据下载
+## 📂 Data Preparation
 
-所有下载好的数据均需放入根目录里的 data 文件夹下，详细结构如下如下 
+Please download the datasets and organize them into the `data/` directory as follows.
 
-![image-20260117110956250](C:\Users\WenJing\Desktop\image-20260117110956250.png)
+**Directory Structure:**
 
-**EuroSAT RGB version Dataset（eursoat）**
+Plaintext
 
-可在 GitHub、keggle、Zenodo 等网站上下载
-
-仅提供 GitHub 下载地址：
-
-下载链接： https://github.com/phelber/eurosathttps://www.kaggle.com/datasets/apollo2506/eurosat-dataset
-
-或直接利用代码通过Hugging Face Datasets直接加载
-
-```py
-from datasets import load_dataset
-dataset = load_dataset("eurosat")
+```
+RS-Prompt-WarmStart/
+├── data/
+│   ├── EuroSAT/
+│   │   └── 2750/              <-- Contains 27,000 images (.jpg/.png)
+│   ├── UCMerced_LandUse/
+│   │   └── Images/            <-- Contains 21 subfolders (.tif)
+│   └── NWPU-RESISC45/         <-- Contains 45 subfolders (.jpg)
+├── weights/
+├── tools/
+└── experiments/
 ```
 
+### Download Links
 
+- **EuroSAT (RGB):** [GitHub](https://github.com/phelber/eurosat) | [Kaggle](https://www.kaggle.com/datasets/apollo2506/eurosat-dataset)
+- **UC Merced (UCM):** [Official Site](http://weegee.vision.ucmerced.edu/datasets/landuse.html)
+- **NWPU-RESISC45:** [TensorFlow Catalog](https://tensorflow.google.cn/datasets/catalog/resisc45)
 
+**Data Splits (Global Seed = 42):**
 
-**UC Merced Land Use Dataset（UCMereced_LandUse）**
+- **EuroSAT:** 80% Training / 20% Testing
+- **UCM:** 50% Training / 50% Testing
+- **RESISC45:** 80% Training / 20% Testing
 
-直接从官方网站下载
+------
 
-下载链接： http://weegee.vision.ucmerced.edu/datasets/landuse.html
+## 🤖 Model Preparation
 
-**NWPU-RESISC45**
+We use the pre-trained `CLIP-ViT-B/32` as our backbone.
 
-![image-20260117103047428](C:\Users\WenJing\AppData\Roaming\Typora\typora-user-images\image-20260117103047428.png)
+Download Weights:
+
+Run the following script to automatically download and save the CLIP model to weights/models/.
+
+```bash
+python weights/download_clip-vit-base-patch32.py
+```
+
+------
+
+## 🚀 Running Experiments
+
+We provide scripts to reproduce all experiments in the paper. All results are deterministic with `seed=42`.
+
+### A. Baseline (Zero-Shot)
+
+Evaluate the direct zero-shot performance of CLIP on the three datasets.
+
+```bash
+# EuroSAT Zero-shot
+python experiments/exp00_baseline/run.py --dataset eurosat
+
+# UCM Zero-shot
+python experiments/exp00_baseline/run.py --dataset ucm
+
+# RESISC45 Zero-shot
+python experiments/exp00_baseline/run.py --dataset resisc45
+```
+
+### B. Warm-Start Training (Main Results)
+
+Train the learnable context vectors using our Warm Start strategy.
+
+- **Note:** The backbone is frozen; only prompts are updated.
+- **Output:** Best model weights will be saved to `weights/outputs/`.
+
+```bash
+# 1. EuroSAT (15 Epochs) -> Acc: ~91.85%
+python experiments/exp01_eurosat_rgb/run.py
+
+# 2. Train on UCM (20 Epochs) -> Acc: ~86.67%
+python experiments/exp02_ucm/run.py
+
+# 3. Train on RESISC45 (25 Epochs) -> Acc: ~85.71%
+python experiments/exp03_resisc45/run.py
+```
+
+### C. Qualitative Analysis (Heatmap)
+
+Generate the confusion matrix to visualize the model's behavior on EuroSAT.
+
+- **Prerequisite:** Ensure `exp01` is finished and weights are saved.
+
+```bash
+python experiments/analysis_eurosat_heatmap/run.py
+# The heatmap will be saved to pictures/eurosat_heatmap.png
+```
+
+### D. Ablation Study (Initialization Dynamics)
+
+Reproduce the 4-line comparison plot (Figure 2 in the paper) to demonstrate the robustness of Warm Start vs. Random Initialization.
+
+```bash
+python experiments/analysis_eurosat_ablation/run.py
+# The plot will be saved to pictures/ablation_initialization.png
+```
+
+### E. Cross-Dataset Transferability
+
+Evaluate the generalization of prompts learned on EuroSAT when directly applied to UCM and RESISC45 (Limitations section).
+
+```bash
+python experiments/analysis_transferability/run.py
+```
+
+------
+
+## 📊 Main Results
+
+| **Dataset**  | **Method**            | **Accuracy (%)** | **Param Storage** |
+| ------------ | --------------------- | ---------------- | ----------------- |
+| **EuroSAT**  | Zero-Shot CLIP        | 43.25            | -                 |
+|              | **Ours (Warm Start)** | **91.85**        | **32 KB**         |
+| **UCM**      | Zero-Shot CLIP        | 59.38            | -                 |
+|              | **Ours (Warm Start)** | **86.67**        | **32 KB**         |
+| **RESISC45** | Zero-Shot CLIP        | 52.83            | -                 |
+|              | **Ours (Warm Start)** | **85.71**        | **32 KB**         |
+
+------
+
+## 🖊️ Citation
+
+If you find this code useful for your research, please consider citing our paper:
+
+Code snippet
+
+```
+@article{Zhou2026Initialization,
+  title={Initialization Matters: Deterministic Warm-Start Prompt Learning for Remote Sensing Recognition},
+  author={Zhou, Wenjing},
+  journal={Manuscript in preparation},
+  year={2026}
+}
+```

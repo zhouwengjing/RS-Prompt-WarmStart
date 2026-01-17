@@ -2,7 +2,6 @@
 import os
 import torch
 import sys
-from tqdm import tqdm
 
 
 # 1. Magic code: Import tools

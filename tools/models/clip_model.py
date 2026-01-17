@@ -25,7 +25,7 @@ class LearnablePromptCLIP(nn.Module):
 
         # Warm Start initialization
         prompt_init = "a photo of a"
-        init_tokenized = self.processor(text=prompt_init, return_tensors="pt", use_fast=False).to(device)
+        init_tokenized = self.processor(text=prompt_init, return_tensors="pt").to(device)
         with torch.no_grad():
             init_embedding = self.clip_model.text_model.embeddings.token_embedding(init_tokenized['input_ids'])
 
@@ -40,7 +40,7 @@ class LearnablePromptCLIP(nn.Module):
         # Preprocess class names
         dummy_prompts = [f"placeholder {name}" for name in class_names]
         tokenized = self.processor(
-            text=dummy_prompts, padding="max_length", max_length=77, return_tensors="pt", truncation=True, use_fast=False
+            text=dummy_prompts, padding="max_length", max_length=77, return_tensors="pt", truncation=True
         ).to(device)
 
         self.tokenized_prompts = tokenized['input_ids']
