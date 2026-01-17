@@ -1,5 +1,6 @@
 # 数据目录 - 保留空目录结构但忽略内容
-data/*
+data/eurosat
+data/
 !data/.gitkeep
 
 # 模型权重文件 - 保留目录但忽略.pth文件
