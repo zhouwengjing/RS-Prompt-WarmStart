@@ -81,12 +81,7 @@ class LearnablePromptCLIP(nn.Module):
         return 100.0 * image_features @ text_features.T
 
 
-def load_clip(
-    model_name_or_path: str,
-    device: Union[str, torch.device],
-    use_fast: bool = False,
-    eval_mode: bool = True,
-) -> Tuple[CLIPModel, CLIPProcessor]:
+def load_clip(model_name_or_path, device, use_fast, eval_mode):
     """
     Load CLIP model and Processor (support local directory or HF name).
     """

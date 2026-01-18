@@ -22,10 +22,10 @@ def build_prompts(class_names: Sequence[str], template: str) -> List[str]:
     return [template.format(c) for c in class_names]
 
 
-@torch.no_grad()
+@dataclass
 def build_text_features(model, processor, prompts: Sequence[str], device) -> torch.Tensor:
     """
-    预计算文本特征：shape [num_classes, dim]
+    Precomputed text features：shape [num_classes, dim]
     """
     text_inputs = processor(text=list(prompts), return_tensors="pt", padding=True).to(device)
     text_features = model.get_text_features(**text_inputs)
@@ -41,7 +41,7 @@ def zero_shot_eval(
     device,
     logit_scale: float = 100.0,
     desc: str = "Evaluating",
-) -> Tuple[float, int, int]:
+):
     """
     return: (acc, correct, total)
     """
@@ -76,7 +76,7 @@ def run_zero_shot(
     prompt_template: str = "a photo of a {}",
     logit_scale: float = 100.0,
     desc: str = "Evaluating",
-) -> ZeroShotResult:
+):
     """
     An end-to-end zero-shot gateway: Given a dataset and dataloader, it directly outputs results.
     """
