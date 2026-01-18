@@ -57,9 +57,11 @@ RS-Prompt-WarmStart/
 │   ├── UCMerced_LandUse/
 │   │   └── Images/            <-- Contains 21 subfolders (.tif)
 │   └── NWPU-RESISC45/         <-- Contains 45 subfolders (.jpg)
-├── weights/
+│
+├── experiments/
+├── pictures/
 ├── tools/
-└── experiments/
+└──  weights/
 ```
 
 ### Download Links
@@ -118,13 +120,16 @@ Train the learnable context vectors using our Warm Start strategy.
 
 ```bash
 # 1. EuroSAT (15 Epochs) -> Acc: ~91.85%
-python experiments/exp01_eurosat_rgb/run.py
+python experiments/exp01_eurosat_rgb/run.py --mode validate  # Validation mode
+python experiments/exp01_eurosat_rgb/run.py --mode train  # Training mode
 
 # 2. Train on UCM (20 Epochs) -> Acc: ~86.67%
-python experiments/exp02_ucm/run.py
+python experiments/exp02_ucm/run.py --mode validate  # Validation mode
+python experiments/exp02_ucm/run.py --mode train  # Training mode
 
 # 3. Train on RESISC45 (25 Epochs) -> Acc: ~85.71%
-python experiments/exp03_resisc45/run.py
+python experiments/exp03_resisc45/run.py --mode validate  # Validation mode
+python experiments/exp03_resisc45/run.py --mode train  # Training mode
 ```
 
 ### C. Qualitative Analysis (Heatmap)

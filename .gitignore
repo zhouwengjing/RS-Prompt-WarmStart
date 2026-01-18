@@ -1,21 +1,21 @@
-# 数据目录 - 保留空目录结构但忽略内容
+# Data directory - keep empty directory structure but ignore content
 data/eurosat
 data/
 !data/.gitkeep
 
-# 模型权重文件 - 保留目录但忽略.pth文件
+# Model weight files - keep the directory but ignore .pth files
 weights/models/
 weights/models/*
 !weights/.gitkeep
 
-# Python缓存
+# Python Cache
 __pycache__/
 *.py[cod]
 *$py.class
 *.so
 .Python
 
-# 包和构建文件
+# Package and Build Files
 build/
 develop-eggs/
 dist/
@@ -32,18 +32,18 @@ wheels/
 .installed.cfg
 *.egg
 
-# IDE文件
+# IDE Files
 .vscode/
 .idea/
 *.swp
 *.swo
 *~
 
-# 系统文件
+# System Filses
 .DS_Store
 Thumbs.db
 
-# 环境文件
+# Environment Files
 .env
 .venv
 env/

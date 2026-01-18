@@ -137,7 +137,7 @@ def plot_results(results):
     # Save path
     save_dir = os.path.join(project_root, 'pictures')
     os.makedirs(save_dir, exist_ok=True)
-    save_path = os.path.join(save_dir, 'ablation_initialization01.png')
+    save_path = os.path.join(save_dir, 'ablation_initialization.png')
 
     plt.savefig(save_path, dpi=300)
     print(f"Line chart saved to: {save_path}")

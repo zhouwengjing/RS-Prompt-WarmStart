@@ -30,8 +30,8 @@ def run_heatmap_analysis():
     # Data should be in RS-Prompt-WarmStart/data
     data_path = os.path.join(project_root, 'data')
 
-    # Image save path: pictures/eurosat_heatmap01.png
-    save_picture_path = os.path.join(project_root, 'pictures', 'eurosat_heatmap01.png')
+    # Image save path: pictures/eurosat_heatmap.png
+    save_picture_path = os.path.join(project_root, 'pictures', 'eurosat_heatmap.png')
 
     # 4. Prepare data (using get_eurosat_loader to get test set)
     # Note: must use get_eurosat_loader! Because it contains random_split logic.
